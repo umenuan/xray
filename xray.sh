@@ -398,8 +398,8 @@ fi
 
 # 更新 argo
 update_argo() {
-    yellow "\n正在更新 Argo...\n"
     stop_argo
+    yellow "\n正在更新 Argo...\n"
     curl -sLo "${work_dir}/argo" "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
     chmod +x ${work_dir}/argo
     restart_argo
