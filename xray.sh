@@ -641,11 +641,9 @@ while true; do
    green  "5. 查看节点"
    green  "6. 修改节点"
    echo  "============="
-   purple "7. ssh_tool"
-   echo  "============="
    red "0. 退出脚本"
    echo "============="
-   reading "请选择(0-7): " choice
+   reading "请选择(0-6): " choice
    echo ""
    case "${choice}" in
         1)  
@@ -663,9 +661,8 @@ while true; do
         4) manage_argo ;;
         5) check_nodes ;;
         6) change_config ;;
-        7) clear && curl -fsSL https://raw.githubusercontent.com/eooce/ssh_tool/main/ssh_tool.sh -o ssh_tool.sh && chmod +x ssh_tool.sh && ./ssh_tool.sh ;;
         0) exit 0 ;;
-        *) red "无效选项，请输入 0 到 7" ;; 
+        *) red "无效选项，请输入 0 到 6" ;; 
    esac
    read -n 1 -s -r -p $'\033[1;91m按任意键继续...\033[0m'
 done
