@@ -50,7 +50,7 @@ fi
 }
 
 #安装依赖
-apt update && apt upgrade -y && apt install -y jq unzip iptables openssl coreutils
+apt update && apt upgrade -y && apt autoremove && apt install -y jq unzip iptables openssl coreutils
 
 # 获取ip
 get_realip() {
