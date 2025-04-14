@@ -439,16 +439,13 @@ case "${choice}" in
         restart_xray
         sed -i "s/[a-fA-F0-9]\{8\}-[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{12\}/$new_uuid/g" $client_dir
         content=$(cat "$client_dir")
-        vmess_urls=$(grep -o 'vmess://[^ ]*' "$client_dir")
         vmess_prefix="vmess://"
-        for vmess_url in $vmess_urls; do
-            encoded_vmess="${vmess_url#"$vmess_prefix"}"
-            decoded_vmess=$(echo "$encoded_vmess" | base64 --decode)
-            updated_vmess=$(echo "$decoded_vmess" | jq --arg new_uuid "$new_uuid" '.id = $new_uuid')
-            encoded_updated_vmess=$(echo "$updated_vmess" | base64 | tr -d '\n')
-            new_vmess_url="$vmess_prefix$encoded_updated_vmess"
-            content=$(echo "$content" | sed "s|$vmess_url|$new_vmess_url|")
-        done
+        encoded_vmess="${vmess_url#"$vmess_prefix"}"
+        decoded_vmess=$(echo "$encoded_vmess" | base64 --decode)
+        updated_vmess=$(echo "$decoded_vmess" | jq --arg new_uuid "$new_uuid" '.id = $new_uuid')
+        encoded_updated_vmess=$(echo "$updated_vmess" | base64 | tr -d '\n')
+        new_vmess_url="$vmess_prefix$encoded_updated_vmess"
+        content=$(echo "$content" | sed "s|$vmess_url|$new_vmess_url|")
         echo "$content" > "$client_dir"
         base64 -w0 $client_dir > /etc/xray/sub.txt
         while IFS= read -r line; do yellow "$line"; done < $client_dir
