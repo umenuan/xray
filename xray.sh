@@ -88,6 +88,24 @@ cat > "${config_dir}" << EOF
 {
   "log": { "access": "/dev/null", "error": "/dev/null", "loglevel": "none" },
   "inbounds": [
+      {
+      "port": $ARGO_PORT,
+      "protocol": "vless",
+      "settings": {
+        "clients": [{ "id": "$UUID", "flow": "xtls-rprx-vision" }],
+        "decryption": "none",
+        "fallbacks": [
+          { "dest": 3001 }, { "path": "/vless-argo", "dest": 3002 },
+          { "path": "/vmess-argo", "dest": 3003 }, { "path": "", "dest": 3004 }
+        ]
+      },
+      "streamSettings": { "network": "tcp" }
+    },
+    {
+      "port": 3001, "listen": "127.0.0.1", "protocol": "vless",
+      "settings": { "clients": [{ "id": "$UUID" }], "decryption": "none" },
+      "streamSettings": { "network": "tcp", "security": "none" }
+    },
     {
       "port": 3002, "listen": "127.0.0.1", "protocol": "vless",
       "settings": { "clients": [{ "id": "$UUID", "level": 0 }], "decryption": "none" },
