@@ -203,8 +203,8 @@ get_info() {
 
   cat > ${work_dir}/url.txt <<EOF
 vless://${UUID}@${CFIP}:${CFPORT}?encryption=none&security=tls&sni=${argodomain}&type=ws&host=${argodomain}&path=%2Fvless-argo%3Fed%3D2048#${isp}
-vmess://$(echo "{ \"v\": \"2\", \"ps\": \"${isp}\", \"add\": \"${CFIP}\", \"port\": \"${CFPORT}\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${argodomain}\", \"path\": \"/vmess-argo?ed=2048\", \"tls\": \"tls\", \"sni\": \"${argodomain}\", \"alpn\": \"\" }" | base64 -w0)
 
+vmess://$(echo "{ \"v\": \"2\", \"ps\": \"${isp}\", \"add\": \"${CFIP}\", \"port\": \"${CFPORT}\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${argodomain}\", \"path\": \"/vmess-argo?ed=2048\", \"tls\": \"tls\", \"sni\": \"${argodomain}\", \"alpn\": \"\" }" | base64 -w0)
 EOF
 echo ""
 while IFS= read -r line; do echo -e "${purple}$line"; done < ${work_dir}/url.txt
@@ -227,7 +227,7 @@ elif [ ${check_xray} -eq 0 ]; then
     sleep 1
     menu
 else
-    yellow "xray 未安装!\n"
+    yellow "xray 尚未安装!\n"
     sleep 1
     menu
 fi
@@ -248,7 +248,7 @@ elif [ ${check_xray} -eq 1 ]; then
     sleep 1
     menu
 else
-    yellow "xray 未安装！\n"
+    yellow "xray 尚未安装！\n"
     sleep 1
     menu
 fi
@@ -270,7 +270,7 @@ elif [ ${check_xray} -eq 1 ]; then
     sleep 1
     menu
 else
-    yellow "xray 未安装！\n"
+    yellow "xray 尚未安装！\n"
     sleep 1
     menu
 fi
@@ -324,7 +324,7 @@ manage_xray() {
         3) restart_xray ;;
         4) update_xray ;;
         5) menu ;;
-        *) red "无效选项！" ;;
+        *) red "无效的选项！" ;;
     esac
 }
 
@@ -344,7 +344,7 @@ elif [ ${check_argo} -eq 0 ]; then
     sleep 1
     menu
 else
-    yellow "Argo 未安装！\n"
+    yellow "Argo 尚未安装！\n"
     sleep 1
     menu
 fi
@@ -389,7 +389,7 @@ elif [ ${check_argo} -eq 1 ]; then
     sleep 1
     menu
 else
-    yellow "Argo 未安装！\n"
+    yellow "Argo 尚未安装！\n"
     sleep 1
     menu
 fi
@@ -430,7 +430,7 @@ green "1. 修改UUID"
 skyblue "------------"
 purple "${purple}2. 返回主菜单"
 skyblue "------------"
-reading "请选择: " choice
+reading "请输入选择: " choice
 case "${choice}" in
     1)
         reading "\n请输入新的UUID: " new_uuid
@@ -452,10 +452,10 @@ case "${choice}" in
         echo "$content" > "$client_dir"
         base64 -w0 $client_dir > /etc/xray/sub.txt
         while IFS= read -r line; do yellow "$line"; done < $client_dir
-        green "\nUUID已修改为：${purple}${new_uuid}${re} ${green}请手动更改所有节点的UUID${re}\n"
+        green "\nUUID已修改为：${purple}${new_uuid}${re} ${green}请更新订阅或手动更改所有节点的UUID${re}\n"
         ;;
     2)  menu ;;
-    *)  red "无效选项！" ;;
+    *)  red "无效的选项！" ;;
 esac
 }
 
@@ -471,14 +471,14 @@ manage_xray() {
     skyblue "-------------------"
     purple "5. 返回主菜单"
     skyblue "------------"
-    reading "\n请选择: " choice
+    reading "\n请输入选择: " choice
     case "${choice}" in
         1) start_xray ;;  
         2) stop_xray ;;
         3) restart_xray ;;
         4) update_xray ;;
         5) menu ;;
-        *) red "无效选项！" ;;
+        *) red "无效的选项！" ;;
     esac
 }
 
@@ -497,7 +497,7 @@ else
     skyblue "------------"
     green "3. 添加Argo固定隧道"
     skyblue "----------------"
-    green "4. 切回Argo临时隧道"
+    green "4. 切换回Argo临时隧道"
     skyblue "------------------"
     green "5. 重新获取Argo临时域名"
     skyblue "-------------------"
@@ -530,13 +530,15 @@ ingress:
 EOF
                 sed -i '/^ExecStart=/c ExecStart=/bin/sh -c "/etc/xray/argo tunnel --edge-ip-version auto --config /etc/xray/tunnel.yml run 2>&1"' /etc/systemd/system/tunnel.service
                 restart_argo
+                add_split_url
                 change_argo_domain
             elif [[ $argo_auth =~ ^[A-Z0-9a-z=]{120,250}$ ]]; then
                 sed -i '/^ExecStart=/c ExecStart=/bin/sh -c "/etc/xray/argo tunnel --edge-ip-version auto --no-autoupdate --protocol http2 run --token '$argo_auth' 2>&1"' /etc/systemd/system/tunnel.service
                 restart_argo
+                add_split_url
                 change_argo_domain
             else
-                yellow "输入的argo域名或token不匹配，请重新输入"
+                yellow "你输入的argo域名或token不匹配，请重新输入"
                 manage_argo            
             fi
             ;; 
@@ -558,7 +560,7 @@ EOF
             fi 
             ;; 
         6)  menu ;; 
-        *)  red "无效选项！" ;;
+        *)  red "无效的选项！" ;;
     esac
 fi
 }
@@ -583,7 +585,7 @@ green "ArgoDomain：${purple}$get_argodomain${re}\n"
 ArgoDomain=$get_argodomain
 }
 
-# 更新Argo域名
+# 更新Argo域名到订阅
 change_argo_domain() {
     sed -i "3s/sni=[^&]*/sni=$ArgoDomain/; 3s/host=[^&]*/host=$ArgoDomain/" /etc/xray/url.txt
     content=$(cat "$client_dir")
@@ -602,7 +604,7 @@ change_argo_domain() {
 
     while IFS= read -r line; do echo -e "${purple}$line"; done < "$client_dir"
     
-    green "\n节点已更新\n"
+    green "\n节点已更新,更新订阅或手动复制以上节点\n"
 }
 
 # 查看节点信息
@@ -632,23 +634,25 @@ while true; do
    purple "Xray-Argo安装脚本\n"
    purple "Xray 状态: ${check_xray_status}\n"
    purple "Argo 状态: ${check_argo_status}\n"   
-   green "1. 安装"
-   red "2. 卸载"
-   echo "============="
+   green "1. 安装Xray-Argo"
+   red "2. 卸载Xray-Argo"
+   echo "==============="
    green "3. Xray管理"
    green "4. Argo管理"
-   echo  "============="
+   echo  "==============="
    green  "5. 查看节点"
    green  "6. 修改节点"
-   echo  "============="
+   echo  "==============="
+   purple "7. ssh_tool"
+   echo  "==============="
    red "0. 退出脚本"
-   echo "============="
-   reading "请选择(0-6): " choice
+   echo "==========="
+   reading "请输入选择(0-7): " choice
    echo ""
    case "${choice}" in
         1)  
             if [ ${check_xray} -eq 0 ]; then
-                yellow "Xray-Argo 已安装！"
+                yellow "Xray-Argo 已经安装！"
             else
                 install_xray
                 main_systemd_services
@@ -661,8 +665,9 @@ while true; do
         4) manage_argo ;;
         5) check_nodes ;;
         6) change_config ;;
+        7) clear && curl -fsSL https://raw.githubusercontent.com/eooce/ssh_tool/main/ssh_tool.sh -o ssh_tool.sh && chmod +x ssh_tool.sh && ./ssh_tool.sh ;;
         0) exit 0 ;;
-        *) red "无效选项，请输入 0 到 6" ;; 
+        *) red "无效的选项，请输入 0 到 7" ;; 
    esac
    read -n 1 -s -r -p $'\033[1;91m按任意键继续...\033[0m'
 done
