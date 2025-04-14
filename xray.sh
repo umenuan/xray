@@ -377,6 +377,20 @@ else
 fi
 }
 
+# 更新 argo
+update_argo() {
+    yellow "\n正在更新 Argo...\n"
+    stop_argo
+    curl -sLo "${work_dir}/argo" "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"
+    chmod +x ${work_dir}/argo
+    restart_argo
+    if [ $? -eq 0 ]; then
+        green "Argo 更新成功!\n"
+    else
+        red "Argo 更新失败\n"
+    fi
+}
+
 # 卸载 xray
 uninstall_xray() {
    reading "确定要卸载 Xray-Argo 吗? (y/n): " choice
@@ -483,7 +497,9 @@ else
     skyblue "------------------"
     green "5. 重新获取Argo临时域名"
     skyblue "-------------------"
-    purple "6. 返回主菜单"
+    green "6. 更新Argo服务"
+    skyblue "-------------"
+    purple "7. 返回主菜单"
     skyblue "-----------"
     reading "\n请输入选择: " choice
     case "${choice}" in
@@ -539,7 +555,8 @@ EOF
                 menu
             fi 
             ;; 
-        6)  menu ;; 
+        6)  update_argo ;;
+        7)  menu ;; 
         *)  red "无效的选项！" ;;
     esac
 fi
