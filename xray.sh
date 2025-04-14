@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # 定义颜色
@@ -204,8 +203,8 @@ get_info() {
 
   cat > ${work_dir}/url.txt <<EOF
 vless://${UUID}@${CFIP}:${CFPORT}?encryption=none&security=tls&sni=${argodomain}&type=ws&host=${argodomain}&path=%2Fvless-argo%3Fed%3D2048#${isp}
-
 vmess://$(echo "{ \"v\": \"2\", \"ps\": \"${isp}\", \"add\": \"${CFIP}\", \"port\": \"${CFPORT}\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${argodomain}\", \"path\": \"/vmess-argo?ed=2048\", \"tls\": \"tls\", \"sni\": \"${argodomain}\", \"alpn\": \"\" }" | base64 -w0)
+
 EOF
 echo ""
 while IFS= read -r line; do echo -e "${purple}$line"; done < ${work_dir}/url.txt
@@ -531,12 +530,10 @@ ingress:
 EOF
                 sed -i '/^ExecStart=/c ExecStart=/bin/sh -c "/etc/xray/argo tunnel --edge-ip-version auto --config /etc/xray/tunnel.yml run 2>&1"' /etc/systemd/system/tunnel.service
                 restart_argo
-                get_info
                 change_argo_domain
             elif [[ $argo_auth =~ ^[A-Z0-9a-z=]{120,250}$ ]]; then
                 sed -i '/^ExecStart=/c ExecStart=/bin/sh -c "/etc/xray/argo tunnel --edge-ip-version auto --no-autoupdate --protocol http2 run --token '$argo_auth' 2>&1"' /etc/systemd/system/tunnel.service
                 restart_argo
-                get_info
                 change_argo_domain
             else
                 yellow "你输入的argo域名或token不匹配，请重新输入"
@@ -635,8 +632,8 @@ while true; do
    purple "Xray-Argo安装脚本\n"
    purple "Xray 状态: ${check_xray_status}\n"
    purple "Argo 状态: ${check_argo_status}\n"   
-   green "1. 安装Xray-Argo"
-   red "2. 卸载Xray-Argo"
+   green "1. 安装Xray"
+   red "2. 卸载Xray"
    echo "==============="
    green "3. Xray管理"
    green "4. Argo管理"
@@ -644,11 +641,9 @@ while true; do
    green  "5. 查看节点"
    green  "6. 修改节点"
    echo  "==============="
-   purple "7. ssh_tool"
-   echo  "==============="
    red "0. 退出脚本"
    echo "==========="
-   reading "请输入选择(0-7): " choice
+   reading "请输入选择(0-6): " choice
    echo ""
    case "${choice}" in
         1)  
@@ -666,9 +661,8 @@ while true; do
         4) manage_argo ;;
         5) check_nodes ;;
         6) change_config ;;
-        7) clear && curl -fsSL https://raw.githubusercontent.com/eooce/ssh_tool/main/ssh_tool.sh -o ssh_tool.sh && chmod +x ssh_tool.sh && ./ssh_tool.sh ;;
         0) exit 0 ;;
-        *) red "无效的选项，请输入 0 到 7" ;; 
+        *) red "无效的选项，请输入 0 到 6" ;; 
    esac
    read -n 1 -s -r -p $'\033[1;91m按任意键继续...\033[0m'
 done
