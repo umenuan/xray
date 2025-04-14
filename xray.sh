@@ -283,7 +283,6 @@ update_xray() {
     # 获取当前版本号
     current_version=$(/etc/xray/xray version | awk '/Xray/' | awk '{print $2}')
     # 获取最新版本号
-    # latest_version=$(curl -sL "https://api.github.com/repos/XTLS/Xray-core/releases/latest" | jq -r '.tag_name')
     latest_version=$(curl -sL "https://api.github.com/repos/XTLS/Xray-core/releases/latest" | jq -r '.tag_name | sub("^v"; "")')
     
     if [ "$current_version" = "$latest_version" ]; then
