@@ -657,7 +657,7 @@ while true; do
    green "4. Argo管理"
    echo  "============="
    green  "5. 查看节点"
-   green  "6. 修改节点"
+   green  "6. 修改UUID"
    echo  "============="
    red "0. 退出脚本"
    echo "============="
